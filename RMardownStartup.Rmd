@@ -1,5 +1,5 @@
 ---
-title: "RMarkdownStartup"
+title: Alcohol Consumption
 author: "Ellis Hodgdon"
 date: "2024-08-06"
 output: html_document
@@ -9,22 +9,42 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r set working directory, echo=FALSE}
+setwd("c:/users/ehodgdon/onedrive/HarvardX/Data_Science/DataScienceProjects/DataScience")
+getwd()
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+## Necessary libraries
+```{r libraries, echo=TRUE}
+if (!require(rvest)) install.packages("rvest")
+if (!require(dplyr)) instsall.packages("dplyr")
+if (!require(tidyr)) install.packages("tidyr")
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+## Preliminary information
+URL of source data: https://data.cdc.gov/500-Cities-Places/500-Cities-Binge-drinking-among-adults-aged-18-yea/gqat-rcqz/data_preview
+URL of ID definitions: https://data.cdc.gov/500-Cities-Places/500-Cities-Binge-drinking-among-adults-aged-18-yea/gqat-rcqz/about_data
+
+Download this data set, remove the column TractFIPS, and extract only "city"
+```{r input raw data, echo=TRUE}
+raw_data <- read.csv("Binge_drinking.csv", header=TRUE)
+colnames(raw_data) <- c("Year", "State", "StateName", "City", "Level", "DataSource", "Category", "ID", "Measure", "Units",
+                         "DataValueTypeID", "DataValueTYpe", "Data_Value", "Low_Limit", "High_Limit", "Footnote_Symbol", "Footnote", "Population",
+                         "Geolocation", "CategoryID", "MeasureID", "CityFIPS", "TractFIPS", "Question_Text")
+                         
+dim(raw_data)
+head(raw_data)
+raw_data$TractFIPS <- NULL
+base_data <- raw_data |> filter(Level == "City")
+dim(base_data)
+head(base_data)
+```
+
+Start cleaning the data by removing any rows that contain NA
+```{r remove NAs}
+base_data <- base_data %>% drop_na()
+dim(base_data)
+
+```
